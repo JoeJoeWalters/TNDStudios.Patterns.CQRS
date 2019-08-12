@@ -1,0 +1,2 @@
+# TNDStudios.Patterns.CQRS
+Example of Azure Functions &amp; UI built with CQRS &amp; SOLID principles in mind. Example is a UI (Web or Mobile) issuing searches that are robustly fulfilled by Azure Functions and a brokering service. Unfortunately built without the use of Service Bus which would have been better but needed the system to work locally with emulators so built with blob triggers instead.
