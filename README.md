@@ -1,2 +1,7 @@
 # TNDStudios.Patterns.CQRS
-Example of Azure Functions &amp; UI built with CQRS &amp; SOLID principles in mind. Example is a UI (Web or Mobile) issuing searches that are robustly fulfilled by Azure Functions and a brokering service. Unfortunately built without the use of Service Bus which would have been better but needed the system to work locally with emulators so built with blob triggers instead.
+
+Example of Azure Functions and UI built with CQRS and SOLID principles to ensure seperation of concerns. 
+
+Example is a UI (Web or Mobile) issuing searches that are robustly fulfilled by Azure Functions and a brokering service and the relevant service can query the state of the searches running via the brokering service even if the UI has crashed in between. 
+
+Note: Unfortunately built without the use of a Service Bus which would have been better but needed the system to work locally with available emulators so built with blob triggers instead. ISearchBroker is fulfilled with LocalSearchBroker for now with this in mind but a ServiceBusBroker can be injected later as the system is built with Dependency Inversion / Injection in mind.
