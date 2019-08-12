@@ -3,6 +3,9 @@ using System;
 
 namespace TNDStudios.Patterns.CQRS.Service.Searches
 {
+    /// <summary>
+    /// Request to start a search
+    /// </summary>
     [JsonObject]
     public class SearchRequest
     {

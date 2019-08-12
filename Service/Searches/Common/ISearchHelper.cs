@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 
 namespace TNDStudios.Patterns.CQRS.Service.Searches
 {
+    /// <summary>
+    /// Interface to define a search helper for the Azure functions
+    /// </summary>
     public interface ISearchHelper
     {
-        SearchRequest GetRequest(Stream blob);
+        /// <summary>
+        /// Get the payload of a request from the incoming stream (could be a service bus message or a blob etc.)
+        /// </summary>
+        /// <param name="blob">The stream from the service that kicked off the process</param>
+        /// <returns>The search request pulled from the stream</returns>
+        SearchRequest GetRequest(Stream stream);
     }
 }

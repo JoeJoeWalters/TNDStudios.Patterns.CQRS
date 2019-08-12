@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TNDStudios.Patterns.CQRS.Service.Searches
 {
+    /// <summary>
+    /// Standard response for when a search is being queried
+    /// </summary>
     [JsonObject]
     public class SearchResponse
     {
