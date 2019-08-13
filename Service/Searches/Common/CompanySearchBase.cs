@@ -37,10 +37,13 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
         /// <returns>If the process was successful</returns>
         public virtual Boolean Process(SearchRequest request)
         {
-            // Some mocked up stuff here to prove a point
-            Thread.Sleep(10000);
+            Int32 randomProcessingTime = (Int32)((new Random()).NextDouble() * 60000);
 
-            return true;
+            // Some mocked up stuff here to prove a point
+            Thread.Sleep(randomProcessingTime);
+
+            // Return a mocked random success or fail value to the caller
+            return ((new Random()).NextDouble() > 0.5);
         }
     }
 }

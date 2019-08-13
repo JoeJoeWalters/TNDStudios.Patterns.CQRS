@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,6 @@ namespace TNDStudios.Patterns.CQRS.Service
         private String connectionString = String.Empty;
 
         // Local objects used to write data created during construction phase
-        CloudStorageAccount storageAccount;
         CloudTableClient client;
         CloudTable table;
 
@@ -30,15 +30,31 @@ namespace TNDStudios.Patterns.CQRS.Service
             // Store the connection string for use later if needed
             this.connectionString = connectionString;
 
-            // Create the storage account linkage
-            storageAccount = CloudStorageAccount.Parse(connectionString);
-            client = storageAccount.CreateCloudTableClient();
+            try
+            {
 
-            // Make sure that the table actually exists
-            table = client.GetTableReference("Searches");
-            Boolean createResult = table.CreateIfNotExistsAsync().Result;
-            if (!createResult)
-                throw new Exception("Could not create search table to store search tokens on initialisation");
+                // Create the storage account linkage            
+                CloudStorageAccount storageAccount;
+                if (CloudStorageAccount.TryParse(this.connectionString, out storageAccount))
+                {
+                    // Create a client to connect to the table
+                    client = storageAccount.CreateCloudTableClient();
+
+                    // Make sure that the table actually exists
+                    table = client.GetTableReference("Searches");
+                    Boolean createResult = table.CreateIfNotExistsAsync().Result;
+                    if (!createResult)
+                        throw new Exception("Could not create search table to store search tokens on initialisation");
+                }
+                else
+                {
+                    throw new Exception("Could not connect to the cloud storage account on initialisation");
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Could not initialise the search broker - '{ex.Message}'");
+            }
         }
 
         /// <summary>
@@ -54,6 +70,9 @@ namespace TNDStudios.Patterns.CQRS.Service
             // Add an entry for each search type for the partition of the token
             foreach (SearchType searchType in (SearchType[])Enum.GetValues(typeof(SearchType)))
             {
+                // Write the trigger to kick off the search (Would be a service bus item but no local emulator for that)
+
+
                 // Construct the table entry for this search and insert it in to the storage account so it 
                 // can be retrieved by the token later
                 SearchEntry searchEntry = new SearchEntry(token, searchType, SearchState.Initialising);
@@ -95,7 +114,7 @@ namespace TNDStudios.Patterns.CQRS.Service
             TableQuerySegment<SearchEntry> segment = null;
             while (segment == null || segment.ContinuationToken != null)
             {
-                // Get the next segment of results to return
+                // Get the next segment of results to return (chunks of 100 so we limit the impact on the server)
                 segment = table.ExecuteQuerySegmentedAsync(query.Take(100), segment?.ContinuationToken).Result;
                 foreach (var entity in segment.Results)
                 {
