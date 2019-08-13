@@ -24,4 +24,4 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: 'Service/Service.prj'
+    projects: 'Service/Service.csprj'
