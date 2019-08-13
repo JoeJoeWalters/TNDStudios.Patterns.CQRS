@@ -2,6 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using TNDStudios.Patterns.CQRS.Service.API;
 
 namespace TNDStudios.Patterns.CQRS.Service.Searches
 {
@@ -11,7 +12,7 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
     public class InternationalCompanySearch : CompanySearchBase
     {
         [FunctionName("InternationalCompanySearch")]
-        public override void Run([BlobTrigger(InternationalTriggerPath, Connection = "AzureWebJobsStorage")]Stream myBlob, string name, ILogger log)
+        public override void Run([BlobTrigger(Constants.InternationalTriggerPath, Connection = "AzureWebJobsStorage")]Stream myBlob, string name, ILogger log)
             => base.Run(myBlob, name, log);
 
         /// <summary>

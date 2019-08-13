@@ -1,7 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
 
-namespace TNDStudios.Patterns.CQRS.Service
+namespace TNDStudios.Patterns.CQRS.Service.API
 {
     /// <summary>
     /// Implementation of the token / record entry that records each element of a search and it's state

@@ -7,10 +7,9 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using TNDStudios.Patterns.CQRS.Service;
 using TNDStudios.Patterns.CQRS.Service.Searches;
 
-namespace Service
+namespace TNDStudios.Patterns.CQRS.Service.API
 {
     /// <summary>
     /// Kick off the search and retrieve a token to use later

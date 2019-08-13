@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Net;
 using TNDStudios.Patterns.CQRS.Service.Searches;
 
-namespace TNDStudios.Patterns.CQRS.Service
+namespace TNDStudios.Patterns.CQRS.Service.API
 {
     /// <summary>
     /// Implementation of the search broker where we cannot use the service bus
@@ -18,8 +18,10 @@ namespace TNDStudios.Patterns.CQRS.Service
         private String connectionString = String.Empty;
 
         // Local objects used to write data created during construction phase
-        CloudTableClient client;
+        CloudTableClient tableClient;
+        CloudBlobClient blobClient;
         CloudTable table;
+        CloudStorageAccount storageAccount;
 
         /// <summary>
         /// Default constructor
@@ -33,15 +35,14 @@ namespace TNDStudios.Patterns.CQRS.Service
             try
             {
 
-                // Create the storage account linkage            
-                CloudStorageAccount storageAccount;
+                // Create the storage account linkage   
                 if (CloudStorageAccount.TryParse(this.connectionString, out storageAccount))
                 {
                     // Create a client to connect to the table
-                    client = storageAccount.CreateCloudTableClient();
+                    tableClient = storageAccount.CreateCloudTableClient();
 
                     // Make sure that the table actually exists
-                    table = client.GetTableReference("Searches");
+                    table = tableClient.GetTableReference("Searches");
                     Boolean createResult = table.CreateIfNotExistsAsync().Result;
                     if (!createResult)
                         throw new Exception("Could not create search table to store search tokens on initialisation");
@@ -67,11 +68,22 @@ namespace TNDStudios.Patterns.CQRS.Service
             // Generate a new token to return to the caller so they can use it to find out the state of the searches
             String token = Guid.NewGuid().ToString();
 
+            // Create a client to write blobs (in place of a service bus later)
+            CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
+
             // Add an entry for each search type for the partition of the token
             foreach (SearchType searchType in (SearchType[])Enum.GetValues(typeof(SearchType)))
             {
                 // Write the trigger to kick off the search (Would be a service bus item but no local emulator for that)
+                // Create the CloudBlobClient that represents the 
+                // Blob storage endpoint for the storage account.
 
+                // Create a container called 'quickstartblobs' and 
+                // append a GUID value to it to make the name unique.
+                CloudBlobContainer cloudBlobContainer =
+                    cloudBlobClient.GetContainerReference("searches" +
+                        Guid.NewGuid().ToString());
+                cloudBlobContainer.CreateAsync().GetAwaiter().GetResult();
 
                 // Construct the table entry for this search and insert it in to the storage account so it 
                 // can be retrieved by the token later

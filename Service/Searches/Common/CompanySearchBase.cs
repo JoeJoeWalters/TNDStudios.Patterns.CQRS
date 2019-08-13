@@ -11,14 +11,6 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
     /// </summary>
     public class CompanySearchBase
     {
-        /// <summary>
-        /// Locations of the blobs that will trigger the services (this would be a service bus topic
-        /// with subscribers in a non-local emulated implementation)
-        /// </summary>
-        internal const String EUTriggerPath = "searches/eu/outstanding/{name}";
-        internal const String UKTriggerPath = "searches/uk/outstanding/{name}";
-        internal const String InternationalTriggerPath = "searches/international/outstanding/{name}";
-
         public virtual void Run(Stream myBlob, string name, ILogger log)
         {
             SearchRequest request = new SearchRequest() { };

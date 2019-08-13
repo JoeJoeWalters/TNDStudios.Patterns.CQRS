@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using TNDStudios.Patterns.CQRS.Service.API;
 
 [assembly: FunctionsStartup(typeof(TNDStudios.Patterns.CQRS.Service.Startup))]
 

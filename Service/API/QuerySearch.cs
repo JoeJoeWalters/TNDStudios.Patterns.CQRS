@@ -6,9 +6,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TNDStudios.Patterns.CQRS.Service;
 
-namespace Service
+namespace TNDStudios.Patterns.CQRS.Service.API
 {
     /// <summary>
     /// Endpoint for checking the state of the search

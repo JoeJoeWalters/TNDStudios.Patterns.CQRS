@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using TNDStudios.Patterns.CQRS.Service.Searches;
 
-namespace TNDStudios.Patterns.CQRS.Service
+namespace TNDStudios.Patterns.CQRS.Service.API
 {
     /// <summary>
     /// The state of the individual searches as part of the overall search
