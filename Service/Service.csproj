@@ -2,8 +2,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
-    <AssemblyName>TNDStudios.Patterns.CQRS.Service</AssemblyName>
-    <RootNamespace>TNDStudios.Patterns.CQRS.Service</RootNamespace>
 
 	<!-- 
 	Fix to Azure Pipelines not being able to decide on the .Net version build version
@@ -12,6 +10,9 @@
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 	<RuntimeFrameworkVersion>2.2</RuntimeFrameworkVersion>
 	<PlatformTarget>AnyCPU</PlatformTarget>
+
+    <AssemblyName>TNDStudios.Patterns.CQRS.Service</AssemblyName>
+    <RootNamespace>TNDStudios.Patterns.CQRS.Service</RootNamespace>
 
   </PropertyGroup>
   <ItemGroup>
