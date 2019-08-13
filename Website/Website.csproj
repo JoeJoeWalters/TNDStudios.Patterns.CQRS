@@ -5,6 +5,15 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <AssemblyName>TNDStudios.Patterns.CQRS.Website</AssemblyName>
     <RootNamespace>TNDStudios.Patterns.CQRS.Website</RootNamespace>
+
+	<!-- 
+	Fix to Azure Pipelines not being able to decide on the .Net version build version
+	https://stackoverflow.com/questions/51642172/the-project-was-restored-using-microsoft-netcore-app-version-2-1-0-but-with-cur/51644988#51644988
+	-->
+	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+	<RuntimeFrameworkVersion>2.2</RuntimeFrameworkVersion>
+	<PlatformTarget>AnyCPU</PlatformTarget>
+
   </PropertyGroup>
 
 
