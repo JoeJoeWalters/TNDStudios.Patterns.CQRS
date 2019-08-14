@@ -22,10 +22,10 @@ Note: Unfortunately built without the use of a Service Bus which would have been
 
 ## Project Site (Kanban)
 I have set up a project site and a Sprint to complete the first pass of this work, click on the link below to view the Kanban board for the first Sprint.
-https://github.com/TNDStudios/TNDStudios.Patterns.CQRS/projects/1
+[https://github.com/TNDStudios/TNDStudios.Patterns.CQRS/projects/1]
 
 ## CI / CD Pipelines
 Click on the below link to view the pipeline that was built to build the project after every commit to master.
-https://dev.azure.com/tndstudios/Builds/_build?definitionId=2&_a=summary
+[https://dev.azure.com/tndstudios/Builds/_build?definitionId=2&_a=summary]
 
 ## Walk Through Video Of The Solution
