@@ -52,8 +52,8 @@ namespace TNDStudios.Patterns.CQRS.Service.API
                     }
 
                     // Create a client to write blobs (in place of a service bus later)
-                    CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
-                    blobContainer = cloudBlobClient.GetContainerReference("searches");
+                    blobClient = storageAccount.CreateCloudBlobClient();
+                    blobContainer = blobClient.GetContainerReference("searches");
                     if (!blobContainer.ExistsAsync().Result)
                     {
                         blobContainer.CreateAsync().GetAwaiter().GetResult();
@@ -64,7 +64,7 @@ namespace TNDStudios.Patterns.CQRS.Service.API
                     throw new Exception("Could not connect to the cloud storage account on initialisation");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Could not initialise the search broker - '{ex.Message}'");
             }
@@ -87,38 +87,41 @@ namespace TNDStudios.Patterns.CQRS.Service.API
             // Add an entry for each search type for the partition of the token
             foreach (SearchType searchType in (SearchType[])Enum.GetValues(typeof(SearchType)))
             {
-                // Write the trigger to kick off the search (Would be a service bus item but no local emulator for that)
-#warning This should be a factory class, implement this later
-                String blobFilename = String.Empty;
-                switch (searchType)
+                if (searchType != SearchType.Unknown)
                 {
-                    case SearchType.EU:
-                        blobFilename = Constants.EUTriggerPath;
-                        break;
+                    // Write the trigger to kick off the search (Would be a service bus item but no local emulator for that)
+#warning This should be a factory class, implement this later
+                    String blobFilename = String.Empty;
+                    switch (searchType)
+                    {
+                        case SearchType.EU:
+                            blobFilename = Constants.EUTriggerPath;
+                            break;
 
-                    case SearchType.International:
-                        blobFilename = Constants.InternationalTriggerPath;
-                        break;
+                        case SearchType.International:
+                            blobFilename = Constants.InternationalTriggerPath;
+                            break;
 
-                    case SearchType.UK:
-                        blobFilename = Constants.UKTriggerPath;
-                        break;
+                        case SearchType.UK:
+                            blobFilename = Constants.UKTriggerPath;
+                            break;
+                    }
+                    blobFilename = blobFilename.Replace("searches/", String.Empty).Replace("{name}", token);
+
+                    // Do the actual write
+                    CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(blobFilename);
+                    cloudBlockBlob.UploadTextAsync(JsonConvert.SerializeObject(request));
+
+                    // Construct the table entry for this search and insert it in to the storage account so it 
+                    // can be retrieved by the token later
+                    SearchEntry searchEntry = new SearchEntry(token, searchType, SearchState.Initialising);
+                    TableOperation insertOp = TableOperation.Insert(searchEntry);
+                    TableResult result = table.ExecuteAsync(insertOp).Result;
+
+                    // Success but no content? If not then it failed and it should be reported back to the caller
+                    if (result.HttpStatusCode != (int)HttpStatusCode.NoContent)
+                        throw new Exception($"Failed to intialise search for '{searchType.ToString()}' - Status Code {result.HttpStatusCode.ToString()}");
                 }
-                blobFilename = blobFilename.Replace("searches/", String.Empty).Replace("{name}", token);
-
-                // Do the actual write
-                CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(blobFilename);
-                cloudBlockBlob.UploadTextAsync(JsonConvert.SerializeObject(request));
-
-                // Construct the table entry for this search and insert it in to the storage account so it 
-                // can be retrieved by the token later
-                SearchEntry searchEntry = new SearchEntry(token, searchType, SearchState.Initialising);
-                TableOperation insertOp = TableOperation.Insert(searchEntry);
-                TableResult result = table.ExecuteAsync(insertOp).Result;
-
-                // Success but no content? If not then it failed and it should be reported back to the caller
-                if (result.HttpStatusCode != (int)HttpStatusCode.NoContent)
-                    throw new Exception($"Failed to intialise search for '{searchType.ToString()}' - Status Code {result.HttpStatusCode.ToString()}");                    
             }
 
             return token; // Send the token back
@@ -138,7 +141,7 @@ namespace TNDStudios.Patterns.CQRS.Service.API
             // Create the query to get just the results for this token
             TableQuery<SearchEntry> query = new TableQuery<SearchEntry>().Where
                 (TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, token));
-            
+
             // Get the results and build the response
             TableQuerySegment<SearchEntry> segment = null;
             while (segment == null || segment.ContinuationToken != null)
@@ -163,6 +166,17 @@ namespace TNDStudios.Patterns.CQRS.Service.API
         /// <returns>If the setting of the state was successful</returns>
         public Boolean SetState(String token, SearchType searchType, SearchState state)
         {
+            // Construct the table entry for this search and insert it in to the storage account so it 
+            // can be retrieved by the token later
+            SearchEntry searchEntry = new SearchEntry(token, searchType, state);
+            searchEntry.ETag = "*";
+            TableOperation insertOp = TableOperation.Replace(searchEntry);
+            TableResult result = table.ExecuteAsync(insertOp).Result;
+
+            // Success but no content? If not then it failed and it should be reported back to the caller
+            if (result.HttpStatusCode != (int)HttpStatusCode.NoContent)
+                throw new Exception($"Failed to update state for '{searchType.ToString()}' - Status Code {result.HttpStatusCode.ToString()}");
+
             return true;
         }
     }

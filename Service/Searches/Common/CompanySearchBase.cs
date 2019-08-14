@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using TNDStudios.Patterns.CQRS.Service.API;
 
@@ -17,7 +19,7 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
         /// The ibject search broker to use as passed in by the parent search implementation
         /// </summary>
         internal ISearchBroker broker = null;
-        internal SearchType searchType;
+        internal SearchType searchType = SearchType.Unknown;
 
         // Faked constants for pretending the system is running an external task
         private const Int32 MaxProcessingTime = 10000;
@@ -28,25 +30,52 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
         /// Base constructor which the searches will channel their dependency injected items to
         /// </summary>
         /// <param name="broker">The prefered search broker to use</param>
-        public CompanySearchBase(ISearchBroker broker, SearchType searchType) => this.broker = broker;
+        public CompanySearchBase(ISearchBroker broker, SearchType searchType)
+        {
+            this.broker = broker;
+            this.searchType = searchType;
+        }
 
         public virtual void Run(Stream stream, string name, ILogger log)
         {
+            // Create a nulled request to start to check for failure
+            SearchRequest request = null;
+
             // Decode the data stream to get the request
-            SearchRequest request = new SearchRequest() { };
-
-            // Send the request to the search processor (which is part of the common base class too or an override)
-            SearchResponse response = Process(request);
-            if (response.Success)
+            try
             {
-                broker.SetState(request.Token, searchType, SearchState.Complete);
-                return;
-            }
+                // Deserialise the stream (no matter where it is from)
+                using (StreamReader reader = new StreamReader(stream))
+                using (JsonTextReader jsonReader = new JsonTextReader(reader))
+                {
+                    JsonSerializer jsonSer = new JsonSerializer();
+                    request = jsonSer.Deserialize<SearchRequest>(jsonReader);
+                }
 
-            // If we get to here then all other options have been exhausted and we will throw and error
-            // and as it is untrapped it will tell the system to try again, no need to log the error here as it will automatically log anyway
-            broker.SetState(request.Token, searchType, SearchState.Failed);
-            throw new Exception("Could not process request, Forcing system to try again.");
+                // Check that the request deserialises ok and there was a token to process
+                if (request != null && (request.Token ?? String.Empty) != String.Empty)
+                {
+                    // Send the request to the search processor (which is part of the common base class too or an override)
+                    SearchResponse response = Process(request);
+                    if (response.Success)
+                    {
+                        broker.SetState(request.Token, searchType, SearchState.Complete);
+                        return;
+                    }
+                }
+                else
+                    log.LogError("Request was empty or request contained no token");
+
+                // If we get to here then all other options have been exhausted and we will throw and error
+                // and as it is untrapped it will tell the system to try again, no need to log the error here as it will automatically log anyway
+                broker.SetState(request.Token, searchType, SearchState.Failed);
+                throw new Exception("Could not process request, Forcing system to try again.");
+            }
+            catch(Exception ex)
+            {
+                broker.SetState(request.Token, searchType, SearchState.Failed);
+                throw new Exception($"Could not process request - '{ex.Message}'");
+            }
         }
 
         /// <summary>

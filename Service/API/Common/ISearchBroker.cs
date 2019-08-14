@@ -20,9 +20,10 @@ namespace TNDStudios.Patterns.CQRS.Service.API
     /// </summary>
     public enum SearchType : Int16
     {
-        UK = 0,
-        EU = 1,
-        International = 2
+        Unknown = 0,
+        UK = 100,
+        EU = 200,
+        International = 300
     }
 
     /// <summary>
