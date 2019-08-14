@@ -1,6 +1,5 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using System;
 using System.IO;
 using TNDStudios.Patterns.CQRS.Service.API;
 
@@ -11,6 +10,12 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
     /// </summary>
     public class UKCompanySearch : CompanySearchBase
     {
+        /// <summary>
+        /// Constructor to inject the broker and other items via DI then channel to base class
+        /// </summary>
+        /// <param name="broker"></param>
+        public UKCompanySearch(ISearchBroker broker) : base(broker, SearchType.UK) { }
+
         [FunctionName("UKCompanySearch")]
         public override void Run([BlobTrigger(Constants.UKTriggerPath, Connection = "AzureWebJobsStorage")]Stream myBlob, string name, ILogger log)
             => base.Run(myBlob, name, log);
@@ -21,7 +26,7 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
         /// </summary>
         /// <param name="request">The request that came in and was processed by the Run method</param>
         /// <returns>If the process was successful</returns>
-        public override Boolean Process(SearchRequest request)
+        public override SearchResponse Process(SearchRequest request)
         {
             return base.Process(request);
         }

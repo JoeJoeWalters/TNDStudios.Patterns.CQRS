@@ -80,10 +80,15 @@ namespace TNDStudios.Patterns.CQRS.Service.API
             // Generate a new token to return to the caller so they can use it to find out the state of the searches
             String token = Guid.NewGuid().ToString();
 
+            // Assign the token to the request so that when it is written to the service bus / trigger / blob
+            // it has all the information the search element needss
+            request.Token = token;
+
             // Add an entry for each search type for the partition of the token
             foreach (SearchType searchType in (SearchType[])Enum.GetValues(typeof(SearchType)))
             {
                 // Write the trigger to kick off the search (Would be a service bus item but no local emulator for that)
+#warning This should be a factory class, implement this later
                 String blobFilename = String.Empty;
                 switch (searchType)
                 {

@@ -41,6 +41,12 @@ namespace TNDStudios.Patterns.CQRS.Service.API
             // Get the payload from the body of the request by deserialising it
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             SearchRequest request = JsonConvert.DeserializeObject<SearchRequest>(requestBody);
+            if (request == null)
+            {
+                String payloadError = "No payload provided, please provide a search payload to process";
+                log.LogError(payloadError);
+                return new BadRequestObjectResult(payloadError);
+            }
 
             try
             {
@@ -55,7 +61,8 @@ namespace TNDStudios.Patterns.CQRS.Service.API
             catch (Exception ex)
             {
                 // The broker returned a failure state, return this to the caller
-                return new BadRequestObjectResult(ex.Message);
+                log.LogError(ex.Message);
+                return new BadRequestObjectResult($"Could not process request - '{ex.Message}'");
             }
         }
     }
