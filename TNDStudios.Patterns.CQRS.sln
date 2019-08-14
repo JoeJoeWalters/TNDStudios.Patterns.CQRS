@@ -7,6 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Website", "Website\Website.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{E25AAF07-2BA0-4F94-B5A7-E5A6F5FC7002}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Postman", "Postman", "{C0453BBE-0876-4450-8C3F-36175D16077C}"
+	ProjectSection(SolutionItems) = preProject
+		Postman\CQRS Test Collection.postman_collection.json = Postman\CQRS Test Collection.postman_collection.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

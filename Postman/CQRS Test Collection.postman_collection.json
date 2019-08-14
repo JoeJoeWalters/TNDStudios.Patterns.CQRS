@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "0a76211f-4427-44a5-8f8b-4b2f9b12a406",
+		"name": "CQRS Test Collection",
+		"description": "CQRS Test Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Start Search",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n}"
+				},
+				"url": {
+					"raw": "http://localhost:7071/api/search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7071",
+					"path": [
+						"api",
+						"search"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": ""
+						}
+					]
+				},
+				"description": "Start A Search"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Status Of Search",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:7071/api/search/66e15e92-ce01-4c0b-951c-0986e42d1843",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7071",
+					"path": [
+						"api",
+						"search",
+						"66e15e92-ce01-4c0b-951c-0986e42d1843"
+					]
+				},
+				"description": "Get the status of a search with the token from the previous request"
+			},
+			"response": []
+		}
+	]
+}
