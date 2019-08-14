@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -18,10 +19,11 @@ namespace TNDStudios.Patterns.CQRS.Service.API
         private String connectionString = String.Empty;
 
         // Local objects used to write data created during construction phase
-        CloudTableClient tableClient;
-        CloudBlobClient blobClient;
-        CloudTable table;
         CloudStorageAccount storageAccount;
+        CloudTableClient tableClient;
+        CloudTable table;
+        CloudBlobClient blobClient;
+        CloudBlobContainer blobContainer;
 
         /// <summary>
         /// Default constructor
@@ -43,9 +45,19 @@ namespace TNDStudios.Patterns.CQRS.Service.API
 
                     // Make sure that the table actually exists
                     table = tableClient.GetTableReference("Searches");
-                    Boolean createResult = table.CreateIfNotExistsAsync().Result;
-                    if (!createResult)
-                        throw new Exception("Could not create search table to store search tokens on initialisation");
+                    if (!table.ExistsAsync().Result)
+                    {
+                        if (!table.CreateIfNotExistsAsync().Result)
+                            throw new Exception("Could not create search table to store search tokens on initialisation");
+                    }
+
+                    // Create a client to write blobs (in place of a service bus later)
+                    CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
+                    blobContainer = cloudBlobClient.GetContainerReference("searches");
+                    if (!blobContainer.ExistsAsync().Result)
+                    {
+                        blobContainer.CreateAsync().GetAwaiter().GetResult();
+                    }
                 }
                 else
                 {
@@ -68,22 +80,30 @@ namespace TNDStudios.Patterns.CQRS.Service.API
             // Generate a new token to return to the caller so they can use it to find out the state of the searches
             String token = Guid.NewGuid().ToString();
 
-            // Create a client to write blobs (in place of a service bus later)
-            CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
-
             // Add an entry for each search type for the partition of the token
             foreach (SearchType searchType in (SearchType[])Enum.GetValues(typeof(SearchType)))
             {
                 // Write the trigger to kick off the search (Would be a service bus item but no local emulator for that)
-                // Create the CloudBlobClient that represents the 
-                // Blob storage endpoint for the storage account.
+                String blobFilename = String.Empty;
+                switch (searchType)
+                {
+                    case SearchType.EU:
+                        blobFilename = Constants.EUTriggerPath;
+                        break;
 
-                // Create a container called 'quickstartblobs' and 
-                // append a GUID value to it to make the name unique.
-                CloudBlobContainer cloudBlobContainer =
-                    cloudBlobClient.GetContainerReference("searches" +
-                        Guid.NewGuid().ToString());
-                cloudBlobContainer.CreateAsync().GetAwaiter().GetResult();
+                    case SearchType.International:
+                        blobFilename = Constants.InternationalTriggerPath;
+                        break;
+
+                    case SearchType.UK:
+                        blobFilename = Constants.UKTriggerPath;
+                        break;
+                }
+                blobFilename = blobFilename.Replace("searches/", String.Empty).Replace("{name}", token);
+
+                // Do the actual write
+                CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(blobFilename);
+                cloudBlockBlob.UploadTextAsync(JsonConvert.SerializeObject(request));
 
                 // Construct the table entry for this search and insert it in to the storage account so it 
                 // can be retrieved by the token later
@@ -109,14 +129,6 @@ namespace TNDStudios.Patterns.CQRS.Service.API
         {
             // Prepare the results that we will be returning
             List<SearchEntry> results = new List<SearchEntry>();
-
-            // Create the storage account linkage
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
-            CloudTableClient client = storageAccount.CreateCloudTableClient();
-
-            // Make sure that the table actually exists
-            CloudTable table = client.GetTableReference("Searches");
-            Boolean createResult = table.CreateIfNotExistsAsync().Result;
 
             // Create the query to get just the results for this token
             TableQuery<SearchEntry> query = new TableQuery<SearchEntry>().Where
