@@ -31,3 +31,6 @@ Click on the below link to view the pipeline that was built to build the project
 <a href="https://dev.azure.com/tndstudios/Builds/_build?definitionId=2&_a=summary">Azure DevOps Build Pipeline Link</a>
 
 ## Walk Through Video Of The Solution
+A quick and dirty walkthrough of the solution and talking about a few of the concepts needed to put it together 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BlmZIn6_fzM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
