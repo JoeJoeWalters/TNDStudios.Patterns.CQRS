@@ -12,7 +12,7 @@
     methods: {
 
         load: function () {
-            app.page.currentToken = "";
+            app.page.currentToken = "No Token";
             app.page.currentSearch.clear();
         },
 
@@ -20,7 +20,7 @@
         startSearch: function () {
 
             // Clear the search
-            app.page.currentToken = "";
+            app.page.currentToken = "No Token";
             app.page.currentSearch.clear();
             tndStudios.models.search.start({ token: null, fromPrice: 0.0, toPrice: 0.0 }, this.startCallback); // Start the search
         },
@@ -29,10 +29,14 @@
         startCallback: function (success, data) {
 
             if (success) {
-
+                if (data) {
+                    app.page.currentToken = data.token;
+                }
+                else
+                    alert("No token was retrieved");
             }
             else {
-
+                alert("No token was retrieved");
             }
         },
     }

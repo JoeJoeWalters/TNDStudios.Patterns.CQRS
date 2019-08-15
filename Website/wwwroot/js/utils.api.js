@@ -19,13 +19,20 @@ tndStudios.utils.api =
                 contentType: 'application/json; charset=utf-8',
                 success: function (data, status, jqXHR) {
 
+                    // Was the call successful?
+                    var success = (status == "success");
+                    if (!success)
+                        alert("Error: " + jqXHR.responseText);
+
                     // Stop the progress spinner
                     tndStudios.utils.ui.progress(false);
 
                     // Success?
-                    callback(data.success, data);
+                    callback(success, data);
                 },
                 error: function (jgXHR, status) {
+
+                    alert("Error: " + jgXHR.responseText);
 
                     // Stop the progress spinner
                     tndStudios.utils.ui.progress(false);
