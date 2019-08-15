@@ -31,6 +31,19 @@ namespace TNDStudios.Patterns.CQRS.Website
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            // In case we need it invertly
+            /*
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowedOrigins",
+                builder =>
+                {
+                    builder.WithOrigins("https://localhost:44336",
+                                           "https://localhost:7071")
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod();
+                });
+            });*/
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
