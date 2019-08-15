@@ -40,7 +40,7 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
         {
             // Create a nulled request to start to check for failure
             SearchRequest request = null;
-
+            
             // Decode the data stream to get the request
             try
             {
@@ -55,6 +55,9 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
                 // Check that the request deserialises ok and there was a token to process
                 if (request != null && (request.Token ?? String.Empty) != String.Empty)
                 {
+                    // Set the state to initialising
+                    broker.SetState(request.Token, searchType, SearchState.Pending);
+
                     // Send the request to the search processor (which is part of the common base class too or an override)
                     SearchResponse response = Process(request);
                     if (response.Success)

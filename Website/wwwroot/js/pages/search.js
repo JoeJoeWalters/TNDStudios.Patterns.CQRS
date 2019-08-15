@@ -62,6 +62,7 @@
                         });
 
                     app.page.searchRunning = doRefresh;
+                    app.page.currentSearch.searchArray = data;
 
                     // Still some items not completed?
                     if (doRefresh) {

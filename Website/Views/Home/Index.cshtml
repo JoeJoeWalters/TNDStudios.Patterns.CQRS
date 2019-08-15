@@ -3,8 +3,8 @@
 }
 
 @section Scripts {
-    <script src="~/js/models/search.js"></script>
-    <script src="~/js/pages/search.js"></script>
+<script src="~/js/models/search.js"></script>
+<script src="~/js/pages/search.js"></script>
 }
 
 <div class="text-center">
@@ -12,8 +12,35 @@
     <p>Click on the start button below to begin a search and watch the screen as it refreshes to show the state of each individual search element.</p>
     <input type="button" v-on:click="startSearch" value="Start Search" />
     <hr />
-    <p>Current Token: {{page.currentToken}}</p>
+    <p>Current Token: <b>{{page.currentToken}}</b></p>
     <p class="btn btn-success" v-if="page.searchRunning">Running Search</p>
     <p class="btn btn-info" v-if="!page.searchRunning">Not Searching</p>
+    <p v-if="page.currentSearch.searchArray.length > 0">
+        Showing Result(s) For {{page.currentSearch.searchArray.length}} External Searches
+    </p>
+    <table class="table table-light table-striped" v-if="page.currentSearch.searchArray.length > 0">
+        <thead>
+            <tr>
+                <th>Search</th>
+                <th>State</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="search in page.currentSearch.searchArray">
+                <td>
+                    <div class="btn btn-outline-info" v-if="search.type == 100">UK</div>
+                    <div class="btn btn-outline-info" v-if="search.type == 200">EU</div>
+                    <div class="btn btn-outline-info" v-if="search.type == 300">International</div>
+                </td>
+                <td>
+                    <div class="btn btn-info" v-if="search.state == 0">Initialising</div>
+                    <div class="btn btn-warning" v-if="search.state == 1">Pending</div>
+                    <div class="btn btn-danger" v-if="search.state == 2">Failed</div>
+                    <div class="btn btn-success" v-if="search.state == 3">Completed</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </p>
 
 </div>

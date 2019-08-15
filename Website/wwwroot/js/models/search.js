@@ -11,7 +11,7 @@ tndStudios.models.search =
             this.searchRunning = false;
         },
 
-        // Package Model
+        // Search Model
         search: function (data) {
 
             // The properties of the object
@@ -24,7 +24,7 @@ tndStudios.models.search =
                 this.clear();
 
                 // Start copying the data from the other object
-                this.searchArray = [];
+                this.searchArray = fromObject;
             }
 
             // Clear this search object (i.e. make it ready for editing)
