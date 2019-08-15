@@ -22,9 +22,9 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
         internal SearchType searchType = SearchType.Unknown;
 
         // Faked constants for pretending the system is running an external task
-        private const Int32 MaxProcessingTime = 10000;
+        private const Int32 MaxProcessingTime = 15000;
         private const Int32 MinProcessingTime = 5000;
-        private const Double ChanceOfFailure = 0.05; // Double because Random is double
+        private const Double ChanceOfFailure = 0.10; // Double because Random is double
 
         /// <summary>
         /// Base constructor which the searches will channel their dependency injected items to
