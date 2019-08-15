@@ -13,5 +13,7 @@
     <input type="button" v-on:click="startSearch" value="Start Search" />
     <hr />
     <p>Current Token: {{page.currentToken}}</p>
+    <p class="btn btn-success" v-if="page.searchRunning">Running Search</p>
+    <p class="btn btn-info" v-if="!page.searchRunning">Not Searching</p>
 
 </div>

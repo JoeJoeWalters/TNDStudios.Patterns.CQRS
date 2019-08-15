@@ -14,6 +14,7 @@
         load: function () {
             app.page.currentToken = "No Token";
             app.page.currentSearch.clear();
+            app.page.searchRunning = false;
         },
 
         // kick off the search
@@ -21,6 +22,7 @@
 
             // Clear the search
             app.page.currentToken = "No Token";
+            app.page.searchRunning = false;
             app.page.currentSearch.clear();
             tndStudios.models.search.start({ token: null, fromPrice: 0.0, toPrice: 0.0 }, this.startSearchCallback); // Start the search
         },
@@ -31,6 +33,7 @@
             if (success) {
                 if (data) {
                     app.page.currentToken = data.token;
+                    app.page.searchRunning = true;
 
                     // Immediatly query the search so we can display the results
                     this.querySearch();
@@ -53,21 +56,22 @@
                 if (data) {
                     var doRefresh = false;
                     $.each(data,
-                        function (index, item)
-                        {
+                        function (index, item) {
                             if (item.state == 0 || item.state == 1)
                                 doRefresh = true;
                         });
 
+                    app.page.searchRunning = doRefresh;
+
                     // Still some items not completed?
                     if (doRefresh) {
-
                         // Tell the system to check again in a second (SignalR probably is better but for now .. )
                         setTimeout(this.querySearch, 1000);
                     }
-                    else
-                        alert("Search Finished");
                 }
+            }
+            else {
+                app.page.searchRunning = false;
             }
         }
     }

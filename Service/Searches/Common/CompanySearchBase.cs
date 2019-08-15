@@ -74,7 +74,8 @@ namespace TNDStudios.Patterns.CQRS.Service.Searches
             catch(Exception ex)
             {
                 broker.SetState(request.Token, searchType, SearchState.Failed);
-                throw new Exception($"Could not process request - '{ex.Message}'");
+#warning Taken out for testing, In reality it would be handled by Azure retry mechanism
+                //throw new Exception($"Could not process request - '{ex.Message}'");
             }
         }
 

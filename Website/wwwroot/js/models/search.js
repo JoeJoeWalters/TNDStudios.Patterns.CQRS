@@ -8,6 +8,7 @@ tndStudios.models.search =
             // The properties of the object            
             this.currentToken = ""; // The token we currently are working with
             this.currentSearch = new tndStudios.models.search.search(null); // The search object
+            this.searchRunning = false;
         },
 
         // Package Model
